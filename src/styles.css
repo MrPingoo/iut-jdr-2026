@@ -1,0 +1,1479 @@
+/* EXACT CSS FROM game.html - STYLES WORLD OF WARCRAFT AUTHENTIQUES */
+
+/* Import des polices WoW */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Uncial+Antiqua&family=Metamorphous:wght@400&display=swap');
+
+/* Reset et base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Page principale authentique WoW */
+body, html, #root {
+    height: 100%;
+    margin: 0;
+    font-family: 'Cinzel', serif;
+}
+
+.hero-page {
+    min-height: 100vh;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+        radial-gradient(ellipse at top, #0f1419 0%, #000 70%),
+        url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBwYXR0ZXJuVW5pdHM9InVzZXJTcGFjZU9uVXNlIj48cGF0aCBkPSJNIDYwIDAgTCAwIDYwIE0gMzAgMCBMIDAgMzAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzA5MGEwYyIgc3Ryb2tlLXdpZHRoPSIxIiBvcGFjaXR5PSIwLjMiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=');
+    color: #f4e4bc;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Effet de particules d'or WoW */
+.hero-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(2px 2px at 20px 30px, #ffd700, transparent),
+        radial-gradient(2px 2px at 40px 70px, #ffb347, transparent),
+        radial-gradient(1px 1px at 90px 40px, #ffd700, transparent),
+        radial-gradient(1px 1px at 130px 80px, #ffb347, transparent),
+        radial-gradient(2px 2px at 160px 30px, #ffd700, transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: sparkle 15s linear infinite;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.background-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.8)),
+        radial-gradient(ellipse at top, #0f1419 0%, #000 70%);
+    pointer-events: none;
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: translateX(0); }
+    100% { transform: translateX(200px); }
+}
+
+@keyframes roll {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(90deg); }
+    50% { transform: rotate(180deg); }
+    75% { transform: rotate(270deg); }
+}
+
+/* ===========================
+   NAVIGATION MENU STYLES
+   =========================== */
+
+.navigation {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: linear-gradient(135deg,
+        rgba(20, 15, 8, 0.98) 0%,
+        rgba(35, 25, 12, 0.98) 50%,
+        rgba(20, 15, 8, 0.98) 100%
+    );
+    border-bottom: 3px solid #b8860b;
+    box-shadow:
+        0 4px 20px rgba(0, 0, 0, 0.8),
+        inset 0 -1px 0 rgba(184, 134, 11, 0.5);
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 70px;
+}
+
+.nav-logo {
+    font-family: 'Uncial Antiqua', cursive;
+    font-size: 2rem;
+    color: #ffd700;
+    text-shadow:
+        0 0 15px #ffd700,
+        0 0 30px rgba(255, 215, 0, 0.5),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.nav-logo:hover {
+    transform: scale(1.05);
+    text-shadow:
+        0 0 20px #ffd700,
+        0 0 40px rgba(255, 215, 0, 0.8),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: 2px solid #b8860b;
+    color: #ffd700;
+    font-size: 1.8rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.nav-toggle:hover {
+    background: rgba(184, 134, 11, 0.2);
+    transform: scale(1.05);
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.nav-item {
+    position: relative;
+}
+
+.nav-link {
+    background: none;
+    border: none;
+    color: #f4e4bc;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+}
+
+.nav-link:hover::before {
+    width: 100%;
+}
+
+.nav-link.logout {
+    color: #ff6b6b;
+}
+
+.nav-link.logout:hover {
+    color: #ff4757;
+    text-shadow: 0 0 10px rgba(255, 71, 87, 0.6);
+}
+
+/* Responsive Navigation */
+@media (max-width: 768px) {
+    .nav-toggle {
+        display: block;
+    }
+
+    .nav-menu {
+        position: absolute;
+        top: 70px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: linear-gradient(135deg,
+            rgba(20, 15, 8, 0.98) 0%,
+            rgba(35, 25, 12, 0.98) 100%
+        );
+        border-bottom: 3px solid #b8860b;
+        padding: 1rem 0;
+        gap: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .nav-menu.active {
+        max-height: 500px;
+    }
+
+    .nav-item {
+        width: 100%;
+        text-align: center;
+        border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+    }
+
+    .nav-link {
+        display: block;
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+/* ===========================
+   HOME PAGE & FORMS - STYLE WOW OFFICIEL
+   =========================== */
+
+/* Container principal */
+.hero-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100vh - 70px);
+    padding: 2rem;
+    padding-top: 3rem;
+    position: relative;
+}
+
+/* Interface principale WoW officielle */
+.hero-content {
+    max-width: 520px;
+    background:
+        linear-gradient(145deg,
+            rgba(20, 15, 8, 0.95) 0%,
+            rgba(35, 25, 12, 0.98) 50%,
+            rgba(20, 15, 8, 0.95) 100%
+        );
+    border: 2px solid #b8860b;
+    border-radius: 0;
+    position: relative;
+    text-align: center;
+    box-shadow:
+        0 0 40px rgba(184, 134, 11, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Bordure décorative WoW */
+.hero-content::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, #8b4513, #b8860b, #daa520, #b8860b, #8b4513);
+    border-radius: 0;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+/* Header décoratif */
+.hero-content::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        #daa520 20%,
+        #ffd700 50%,
+        #daa520 80%,
+        transparent 100%
+    );
+}
+
+/* Padding interne */
+.hero-content-inner {
+    padding: 3rem 2.5rem 2.5rem;
+}
+
+/* Logo/Titre principal WoW */
+.hero-title {
+    font-family: 'Metamorphous', cursive;
+    font-size: 2.8rem;
+    font-weight: 400;
+    color: #ffd700;
+    text-shadow:
+        0 0 10px #ffd700,
+        2px 2px 0 #8b4513,
+        4px 4px 0 rgba(0, 0, 0, 0.8);
+    margin-bottom: 0.5rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: relative;
+}
+
+/* Sous-titre authentique */
+.hero-subtitle {
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    color: #c9aa71;
+    margin-bottom: 2.5rem;
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+/* Séparateur doré */
+.hero-divider {
+    width: 200px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #daa520, transparent);
+    margin: 1.5rem auto;
+}
+
+/* Container des boutons */
+.hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+/* Boutons authentiques WoW */
+.hero-btn {
+    display: block;
+    width: 100%;
+    padding: 1rem 2rem;
+    background: linear-gradient(180deg, #3c3c3c 0%, #2a2a2a 50%, #1a1a1a 100%);
+    border: 2px solid #555;
+    color: #f4e4bc;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.hero-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.3s ease;
+}
+
+.hero-btn:hover::before {
+    left: 100%;
+}
+
+.hero-btn:hover {
+    background: linear-gradient(180deg, #4a4a4a 0%, #383838 50%, #282828 100%);
+    border-color: #777;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.hero-btn:active {
+    transform: translateY(0);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+        0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Bouton primaire (Login) */
+.hero-btn-login {
+    background: linear-gradient(180deg, #5a7bb8 0%, #3d5998 50%, #2d4373 100%);
+    border-color: #6b8bc9;
+    color: #ffffff;
+}
+
+.hero-btn-login:hover {
+    background: linear-gradient(180deg, #6b8bc9 0%, #4e6aa9 50%, #3e5584 100%);
+    border-color: #7c9cda;
+}
+
+/* Bouton secondaire (Create) */
+.hero-btn-create {
+    background: linear-gradient(180deg, #b85a5a 0%, #983d3d 50%, #732d2d 100%);
+    border-color: #c96b6b;
+    color: #ffffff;
+}
+
+.hero-btn-create:hover {
+    background: linear-gradient(180deg, #c96b6b 0%, #a94e4e 50%, #845e3e 100%);
+    border-color: #da7c7c;
+}
+
+/* Icônes */
+.btn-icon {
+    display: inline-block;
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+    vertical-align: middle;
+}
+
+/* Footer avec liens */
+.hero-footer {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.hero-footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.hero-footer-link {
+    color: #c9aa71;
+    text-decoration: none;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: color 0.2s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+}
+
+.hero-footer-link:hover {
+    color: #ffd700;
+}
+
+/* Styles pour les formulaires WoW */
+.hero-form {
+    margin-top: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.form-label {
+    display: block;
+    color: #c9aa71;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
+    border: 2px solid #555;
+    color: #f4e4bc;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    border-radius: 0;
+    transition: all 0.2s ease;
+    box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #b8860b;
+    background: linear-gradient(180deg, #252525 0%, #353535 100%);
+    box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05),
+        0 0 0 2px rgba(184, 134, 11, 0.3);
+}
+
+.form-input::placeholder {
+    color: #666;
+    font-style: italic;
+}
+
+/* Validation styles */
+.form-input:valid {
+    border-color: #4a7c59;
+}
+
+.form-input.error {
+    border-color: #b85a5a;
+}
+
+.form-error {
+    color: #ff6b6b;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    font-family: 'Cinzel', serif;
+}
+
+/* ===========================
+   BOARD PAGE STYLES - WOW OFFICIEL
+   =========================== */
+
+.board-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.board-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.character-list {
+    background:
+        linear-gradient(145deg,
+            rgba(20, 15, 8, 0.95) 0%,
+            rgba(35, 25, 12, 0.98) 50%,
+            rgba(20, 15, 8, 0.95) 100%
+        );
+    border: 2px solid #b8860b;
+    border-radius: 0;
+    box-shadow:
+        0 0 40px rgba(184, 134, 11, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    position: relative;
+}
+
+.character-list::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(45deg, #8b4513, #b8860b, #daa520, #b8860b, #8b4513);
+    border-radius: 0;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.character-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.character-table th {
+    background: linear-gradient(180deg, #2d1f0a 0%, #1a1208 100%);
+    color: #ffd700;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1.2rem 1rem;
+    text-align: left;
+    border-bottom: 2px solid #b8860b;
+    text-shadow: 0 0 5px #ffd700;
+}
+
+.character-table th:first-child {
+    border-left: none;
+}
+
+.character-table th:last-child {
+    text-align: center;
+}
+
+.character-table td {
+    padding: 1rem;
+    color: #f4e4bc;
+    font-family: 'Cinzel', serif;
+    border-bottom: 1px solid rgba(184, 134, 11, 0.3);
+    background: rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+}
+
+.character-table tbody tr:hover td {
+    background: rgba(184, 134, 11, 0.1);
+}
+
+.character-name {
+    font-weight: 600;
+    color: #daa520;
+    font-size: 1.1rem;
+}
+
+.race-class {
+    color: #c9aa71;
+    font-style: italic;
+}
+
+.race {
+    color: #87ceeb;
+    font-weight: 500;
+}
+
+.class {
+    color: #ffa500;
+    font-weight: 500;
+}
+
+.action-cell {
+    text-align: center;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
+    border: 2px solid #555;
+    color: #f4e4bc;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.action-btn:hover {
+    background: linear-gradient(180deg, #b8860b 0%, #8b4513 100%);
+    border-color: #daa520;
+    color: #fff;
+    box-shadow:
+        0 0 15px rgba(184, 134, 11, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.btn-play {
+    background: linear-gradient(180deg, #228b22 0%, #006400 100%);
+    border-color: #32cd32;
+}
+
+.btn-play:hover {
+    background: linear-gradient(180deg, #32cd32 0%, #228b22 100%);
+    box-shadow:
+        0 0 15px rgba(50, 205, 50, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn-edit {
+    background: linear-gradient(180deg, #4169e1 0%, #1e90ff 100%);
+    border-color: #87ceeb;
+}
+
+.btn-edit:hover {
+    background: linear-gradient(180deg, #87ceeb 0%, #4169e1 100%);
+    box-shadow:
+        0 0 15px rgba(135, 206, 235, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn-delete {
+    background: linear-gradient(180deg, #dc143c 0%, #8b0000 100%);
+    border-color: #ff6347;
+}
+
+.btn-delete:hover {
+    background: linear-gradient(180deg, #ff6347 0%, #dc143c 100%);
+    box-shadow:
+        0 0 15px rgba(255, 99, 71, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.create-character-section {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.hero-btn-create-new {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 1rem 2.5rem;
+    background: linear-gradient(180deg, #228b22 0%, #006400 100%);
+    border: 2px solid #32cd32;
+    color: #fff;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.1),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+.hero-btn-create-new:hover {
+    background: linear-gradient(180deg, #32cd32 0%, #228b22 100%);
+    box-shadow:
+        0 0 25px rgba(50, 205, 50, 0.8),
+        inset 0 2px 4px rgba(255, 255, 255, 0.1),
+        inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #c9aa71;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .character-table th,
+    .character-table td {
+        padding: 0.8rem 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .action-btn {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem;
+    }
+
+    .hero-btn-create-new {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+    }
+}
+
+/* ===========================
+   PERSO PAGE STYLES - WOW OFFICIEL
+   =========================== */
+
+.character-sheet {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-col {
+    flex: 1;
+}
+
+.range-container {
+    margin-top: 0.5rem;
+}
+
+.form-range {
+    width: 100%;
+    height: 8px;
+    background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 100%);
+    border: 1px solid #555;
+    outline: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.form-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(180deg, #daa520 0%, #b8860b 100%);
+    border: 2px solid #8b4513;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.form-range::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(180deg, #daa520 0%, #b8860b 100%);
+    border: 2px solid #8b4513;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.range-value {
+    display: inline-block;
+    min-width: 30px;
+    color: #ffd700;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-left: 0.5rem;
+}
+
+.stats-table {
+    width: 100%;
+    margin-top: 1rem;
+    border-collapse: collapse;
+}
+
+.stats-table th,
+.stats-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.stats-table th {
+    color: #daa520;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    background: rgba(184, 134, 11, 0.1);
+}
+
+.stats-table td {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.stat-range {
+    width: 150px;
+}
+
+.section-title {
+    color: #ffd700;
+    font-size: 1.4rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 2rem 0 1rem 0;
+    text-align: center;
+    text-shadow: 0 0 10px #ffd700;
+}
+
+.player-count-display {
+    text-align: center;
+    margin-top: 1rem;
+    color: #c9aa71;
+    font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .stats-table th,
+    .stats-table td {
+        padding: 0.7rem 0.5rem;
+    }
+
+    .stat-range {
+        width: 120px;
+    }
+}
+
+/* ===========================
+   RESPONSIVE ADJUSTMENTS
+   =========================== */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .board-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid-form {
+        grid-template-columns: 1fr;
+    }
+
+    .card-actions {
+        flex-direction: column;
+    }
+
+    .card-btn {
+        width: 100%;
+    }
+}
+
+/* ===========================
+   BOUTON RETOUR MAGNIFIQUE
+   =========================== */
+
+.btn-back {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 0.6rem 1.2rem;
+    background: linear-gradient(145deg,
+        rgba(20, 15, 8, 0.95) 0%,
+        rgba(35, 25, 12, 0.98) 50%,
+        rgba(20, 15, 8, 0.95) 100%
+    );
+    color: #ffd700;
+    border: 2px solid #b8860b;
+    border-radius: 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.5),
+        inset 0 1px 2px rgba(255, 215, 0, 0.1),
+        0 0 10px rgba(184, 134, 11, 0.2);
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Effet de brillance au survol */
+.btn-back::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 215, 0, 0.2),
+        transparent
+    );
+    transition: left 0.5s ease;
+}
+
+.btn-back:hover::before {
+    left: 100%;
+}
+
+/* Bordure animée */
+.btn-back::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg,
+        #b8860b,
+        #ffd700,
+        #b8860b,
+        #ffd700
+    );
+    background-size: 300% 300%;
+    border-radius: 8px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: borderGlow 3s ease infinite;
+}
+
+.btn-back:hover::after {
+    opacity: 1;
+}
+
+@keyframes borderGlow {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.btn-back:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow:
+        0 6px 18px rgba(0, 0, 0, 0.7),
+        inset 0 2px 4px rgba(255, 215, 0, 0.2),
+        0 0 20px rgba(255, 215, 0, 0.5),
+        0 0 30px rgba(184, 134, 11, 0.3);
+    color: #fff;
+    text-shadow:
+        0 0 12px #ffd700,
+        0 0 20px rgba(255, 215, 0, 0.7);
+    border-color: #ffd700;
+}
+
+.btn-back:active {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.7),
+        inset 0 2px 4px rgba(255, 215, 0, 0.15),
+        0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+/* Icône de flèche animée */
+.btn-back-icon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 1rem;
+}
+
+.btn-back:hover .btn-back-icon {
+    transform: translateX(-5px);
+    animation: arrowBounce 0.6s ease infinite;
+}
+
+@keyframes arrowBounce {
+    0%, 100% {
+        transform: translateX(-5px);
+    }
+    50% {
+        transform: translateX(-10px);
+    }
+}
+
+/* Effet de particules dorées */
+.btn-back:hover {
+    animation: btnGlow 1.5s ease-in-out infinite;
+}
+
+@keyframes btnGlow {
+    0%, 100% {
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.2);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .btn-back {
+        font-size: 0.75rem;
+        padding: 0.5rem 1rem;
+        gap: 0.4rem;
+    }
+}
+
+/* Layout principal du jeu */
+.game-layout {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+}
+
+.game-sidebar {
+    width: 33.33%;
+    background:
+        linear-gradient(145deg,
+            rgba(20, 15, 8, 0.95) 0%,
+            rgba(35, 25, 12, 0.98) 50%,
+            rgba(20, 15, 8, 0.95) 100%
+        );
+    border-right: 2px solid #b8860b;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.game-main {
+    width: 66.67%;
+    display: flex;
+    flex-direction: column;
+    background:
+        linear-gradient(145deg,
+            rgba(15, 10, 5, 0.95) 0%,
+            rgba(25, 20, 10, 0.98) 50%,
+            rgba(15, 10, 5, 0.95) 100%
+        );
+}
+
+/* Panneau personnage */
+.character-panel {
+    padding: 1.5rem;
+    border-bottom: 2px solid rgba(184, 134, 11, 0.3);
+    flex-shrink: 0;
+}
+
+.character-avatar {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.character-portrait {
+    width: 120px;
+    height: 120px;
+    border: 3px solid #b8860b;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow:
+        0 0 20px rgba(184, 134, 11, 0.6),
+        inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.character-name {
+    font-family: 'Cinzel', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffd700;
+    margin-top: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.character-info {
+    color: #c9aa71;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.8rem;
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    text-align: center;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #c9aa71;
+    text-transform: uppercase;
+    margin-bottom: 0.3rem;
+}
+
+.stat-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffd700;
+}
+
+/* Panneau compagnons */
+.companions-panel {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.companions-title {
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffd700;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 8px #ffd700;
+}
+
+.companions-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.companions-table th {
+    background: rgba(184, 134, 11, 0.2);
+    color: #daa520;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    padding: 0.8rem 0.5rem;
+    border: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.companions-table td {
+    padding: 0.8rem 0.5rem;
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    color: #f4e4bc;
+    font-size: 0.85rem;
+}
+
+.companion-status {
+    text-align: center;
+    font-weight: 600;
+}
+
+.status-alive {
+    color: #32cd32;
+}
+
+.status-dead {
+    color: #ff6347;
+}
+
+/* Zone de chat principale */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #b8860b;
+    padding: 1rem;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    font-family: 'Cinzel', serif;
+    line-height: 1.6;
+    scrollbar-width: thin;
+    scrollbar-color: #b8860b rgba(0, 0, 0, 0.3);
+}
+
+/* Scrollbar personnalisée pour WebKit (Chrome, Safari, Edge) */
+.chat-messages::-webkit-scrollbar {
+    width: 14px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.7) 0%, rgba(20, 15, 8, 0.7) 100%);
+    border: 1px solid rgba(184, 134, 11, 0.4);
+    border-radius: 0;
+    box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.5);
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #daa520 0%, #b8860b 50%, #8b4513 100%);
+    border: 1px solid #654321;
+    border-radius: 0;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+        0 0 4px rgba(184, 134, 11, 0.3);
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ffd700 0%, #daa520 50%, #b8860b 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+        0 0 8px rgba(255, 215, 0, 0.6);
+    border-color: #8b4513;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(180deg, #b8860b 0%, #8b4513 50%, #654321 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(0, 0, 0, 0.2),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.chat-messages::-webkit-scrollbar-corner {
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(184, 134, 11, 0.3);
+}
+
+.message {
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    background: rgba(184, 134, 11, 0.1);
+    border-left: 3px solid #b8860b;
+}
+
+.message-dm {
+    color: #ffd700;
+    font-weight: 600;
+}
+
+.message-system {
+    color: #87ceeb;
+    font-style: italic;
+}
+
+.message-action {
+    color: #ffa500;
+}
+
+.message-narrator {
+    color: #c9aa71;
+}
+
+/* Zone de saisie */
+.chat-input-area {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+}
+
+.input-container {
+    flex: 1;
+}
+
+.chat-input {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(180deg, #1a1a1a 0%, #2a2a2a 100%);
+    border: 2px solid #555;
+    color: #f4e4bc;
+    font-family: 'Cinzel', serif;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 60px;
+    max-height: 120px;
+}
+
+.chat-input:focus {
+    outline: none;
+    border-color: #b8860b;
+    box-shadow: 0 0 0 2px rgba(184, 134, 11, 0.3);
+}
+
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.btn-send {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(180deg, #228b22 0%, #006400 100%);
+    border: 2px solid #32cd32;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-send:hover {
+    background: linear-gradient(180deg, #32cd32 0%, #228b22 100%);
+    box-shadow: 0 0 15px rgba(50, 205, 50, 0.6);
+}
+
+.btn-dice {
+    padding: 1rem 1.5rem;
+    background: linear-gradient(180deg, #dc143c 0%, #8b0000 100%);
+    border: 2px solid #ff6347;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.1rem;
+}
+
+.btn-dice:hover {
+    background: linear-gradient(180deg, #ff6347 0%, #dc143c 100%);
+    box-shadow: 0 0 15px rgba(255, 99, 71, 0.6);
+    transform: translateY(-2px);
+}
+
+.dice-result {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, rgba(20, 15, 8, 0.98), rgba(35, 25, 12, 0.98));
+    border: 3px solid #ffd700;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+    display: none;
+}
+
+.dice-animation {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: roll 1s ease-in-out;
+}
+
+.dice-value {
+    font-size: 3rem;
+    color: #ffd700;
+    font-weight: 700;
+    text-shadow: 0 0 15px #ffd700;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .game-layout {
+        flex-direction: column;
+    }
+
+    .game-sidebar {
+        width: 100%;
+        height: 40%;
+        border-right: none;
+        border-bottom: 2px solid #b8860b;
+    }
+
+    .game-main {
+        width: 100%;
+        height: 60%;
+    }
+
+    .companions-panel {
+        display: none;
+    }
+}
+
