@@ -1,17 +1,45 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { login } from '../utils/api'
+import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { login: setAuthToken } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    // Récupérer le message de succès depuis la navigation
+    if (location.state?.message) {
+      setSuccess(location.state.message)
+      // Nettoyer le state pour éviter que le message persiste
+      window.history.replaceState({}, document.title)
+    }
+  }, [location])
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Validation simple
-    if (email && password) {
+    setError('')
+    setLoading(true)
+
+    try {
+      // Appel à l'API avec username (qui est l'email)
+      const data = await login(email, password)
+
+      // Sauvegarder le token
+      setAuthToken(data.token)
+
       // Redirection vers le board après connexion
       navigate('/board')
+    } catch (err) {
+      setError(err.message || 'Erreur de connexion')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -24,6 +52,18 @@ export default function Login() {
             <h1 className="hero-title">Se connecter</h1>
             <div className="hero-divider"></div>
             <p className="hero-subtitle">Bienvenue, aventurier</p>
+
+            {success && (
+              <div className="form-success" style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: 'rgba(34, 197, 94, 0.1)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '4px', color: '#16a34a' }}>
+                {success}
+              </div>
+            )}
+
+            {error && (
+              <div className="form-error" style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: 'rgba(220, 38, 38, 0.1)', border: '1px solid rgba(220, 38, 38, 0.3)', borderRadius: '4px', color: '#dc2626' }}>
+                {error}
+              </div>
+            )}
 
             <form className="hero-form" onSubmit={handleSubmit}>
               <div className="form-group">
@@ -53,9 +93,9 @@ export default function Login() {
               </div>
 
               <div className="hero-buttons">
-                <button type="submit" className="hero-btn hero-btn-login">
+                <button type="submit" className="hero-btn hero-btn-login" disabled={loading}>
                   <span className="btn-icon">🛡️</span>
-                  Se connecter
+                  {loading ? 'Connexion...' : 'Se connecter'}
                 </button>
                 <button
                   type="button"

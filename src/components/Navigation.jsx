@@ -1,15 +1,23 @@
 import React, { useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { GameContext } from '../context/GameContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function Navigation() {
   const navigate = useNavigate()
   const { state } = useContext(GameContext)
+  const { isAuthenticated, logout } = useAuth()
   const [isOpen, setIsOpen] = React.useState(false)
 
   const handleNavigation = (path) => {
     navigate(path)
     setIsOpen(false)
+  }
+
+  const handleLogout = () => {
+    logout()
+    setIsOpen(false)
+    navigate('/')
   }
 
   return (
@@ -29,25 +37,29 @@ export default function Navigation() {
               🏠 Accueil
             </button>
           </li>
-          {state.selectedCharacter ? (
+          {isAuthenticated ? (
             <>
-              <li className="nav-item">
-                <button className="nav-link" onClick={() => handleNavigation('/game')}>
-                  🎮 Partie
-                </button>
-              </li>
               <li className="nav-item">
                 <button className="nav-link" onClick={() => handleNavigation('/board')}>
                   📋 Mes Personnages
                 </button>
               </li>
+              {state.selectedCharacter && (
+                <>
+                  <li className="nav-item">
+                    <button className="nav-link" onClick={() => handleNavigation('/perso')}>
+                      ⚔️ Fiche Personnage
+                    </button>
+                  </li>
+                  <li className="nav-item">
+                    <button className="nav-link" onClick={() => handleNavigation('/game')}>
+                      🎮 Partie
+                    </button>
+                  </li>
+                </>
+              )}
               <li className="nav-item">
-                <button className="nav-link" onClick={() => handleNavigation('/perso')}>
-                  ⚔️ Fiche Personnage
-                </button>
-              </li>
-              <li className="nav-item">
-                <button className="nav-link logout" onClick={() => handleNavigation('/')}>
+                <button className="nav-link logout" onClick={handleLogout}>
                   🚪 Déconnexion
                 </button>
               </li>

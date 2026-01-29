@@ -1,6 +1,8 @@
 import React from 'react'
 import { Routes, Route, useLocation } from 'react-router-dom'
 import { GameProvider } from './context/GameContext.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Navigation from './components/Navigation.jsx'
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
@@ -17,16 +19,18 @@ export default function App() {
   const showNav = !hideNavPages.includes(location.pathname)
 
   return (
-    <GameProvider>
-      {showNav && <Navigation />}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/create" element={<Create />} />
-        <Route path="/board" element={<Board />} />
-        <Route path="/perso" element={<Perso />} />
-        <Route path="/game" element={<Game />} />
-      </Routes>
-    </GameProvider>
+    <AuthProvider>
+      <GameProvider>
+        {showNav && <Navigation />}
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/create" element={<Create />} />
+          <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} />
+          <Route path="/perso" element={<ProtectedRoute><Perso /></ProtectedRoute>} />
+          <Route path="/game" element={<ProtectedRoute><Game /></ProtectedRoute>} />
+        </Routes>
+      </GameProvider>
+    </AuthProvider>
   )
 }

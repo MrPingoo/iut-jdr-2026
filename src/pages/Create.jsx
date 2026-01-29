@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { register } from '../utils/api'
 
 export default function Create() {
   const navigate = useNavigate()
@@ -8,6 +9,8 @@ export default function Create() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordMatch, setPasswordMatch] = useState(true)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const handlePasswordChange = (value) => {
     setPassword(value)
@@ -21,10 +24,32 @@ export default function Create() {
     setPasswordMatch(password === value)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (passwordMatch && username && email && password) {
-      navigate('/login')
+    setError('')
+
+    if (!passwordMatch) {
+      setError('Les mots de passe ne correspondent pas')
+      return
+    }
+
+    if (!username || !email || !password) {
+      setError('Tous les champs sont requis')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      // Appel à l'API d'inscription
+      await register(email, password)
+
+      // Redirection vers la page de connexion après inscription
+      navigate('/login', { state: { message: 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.' } })
+    } catch (err) {
+      setError(err.message || 'Erreur lors de l\'inscription')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -37,6 +62,12 @@ export default function Create() {
             <h1 className="hero-title">Créer un compte</h1>
             <div className="hero-divider"></div>
             <p className="hero-subtitle">Rejoignez l'aventure</p>
+
+            {error && (
+              <div className="form-error" style={{ marginBottom: '1rem', padding: '0.75rem', backgroundColor: 'rgba(220, 38, 38, 0.1)', border: '1px solid rgba(220, 38, 38, 0.3)', borderRadius: '4px', color: '#dc2626' }}>
+                {error}
+              </div>
+            )}
 
             <form className="hero-form" onSubmit={handleSubmit}>
               <div className="form-group">
@@ -99,10 +130,10 @@ export default function Create() {
                 <button
                   type="submit"
                   className="hero-btn hero-btn-create"
-                  disabled={!passwordMatch}
+                  disabled={!passwordMatch || loading}
                 >
                   <span className="btn-icon">⚔️</span>
-                  Créer mon compte
+                  {loading ? 'Création...' : 'Créer mon compte'}
                 </button>
                 <button
                   type="button"
