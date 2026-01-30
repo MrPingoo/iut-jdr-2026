@@ -112,3 +112,57 @@ export async function fetchAPI(endpoint, options = {}) {
 
   return response.json()
 }
+
+/**
+ * Crée un nouveau personnage
+ * @param {object} characterData - Données du personnage
+ * @returns {Promise<any>}
+ */
+export async function createCharacter(characterData) {
+  return fetchAPI('/characters', {
+    method: 'POST',
+    body: JSON.stringify(characterData),
+  })
+}
+
+/**
+ * Récupère la liste de tous les personnages
+ * @returns {Promise<Array>}
+ */
+export async function getCharacters() {
+  return fetchAPI('/characters')
+}
+
+/**
+ * Récupère un personnage spécifique
+ * @param {number} id - ID du personnage
+ * @returns {Promise<any>}
+ */
+export async function getCharacter(id) {
+  return fetchAPI(`/characters/${id}`)
+}
+
+/**
+ * Met à jour un personnage
+ * @param {number} id - ID du personnage
+ * @param {object} characterData - Données à mettre à jour
+ * @returns {Promise<any>}
+ */
+export async function updateCharacter(id, characterData) {
+  return fetchAPI(`/characters/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(characterData),
+  })
+}
+
+/**
+ * Supprime un personnage
+ * @param {number} id - ID du personnage
+ * @returns {Promise<any>}
+ */
+export async function deleteCharacter(id) {
+  return fetchAPI(`/characters/${id}`, {
+    method: 'DELETE',
+  })
+}
+

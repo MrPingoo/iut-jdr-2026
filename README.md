@@ -1,26 +1,29 @@
-# 🎲 JDR React - Converti depuis game.html
+# 🎲 JDR React - Application de Jeu de Rôle
 
-Application de Jeu de Rôle (D&D) interactive construite avec **React + Vite**.
+Application de Jeu de Rôle (D&D) interactive construite avec **React + Vite** et authentifiée via **Symfony API + JWT**.
 
 ## 📋 Description
 
-Cette application reproduit **100% du design et du CSS** de `game.html` en une application React moderne et réactive.
+Cette application est une plateforme complète de Jeu de Rôle avec gestion des personnages, système de combat, et authentification sécurisée.
 
 ### ✨ Fonctionnalités
 
+- ✅ **Authentification JWT** (inscription, connexion, déconnexion)
+- ✅ **Routes protégées** avec redirection automatique
+- ✅ **Gestion des personnages** avec statistiques
 - ✅ **Chat en temps réel** avec messages du Maître du Jeu
 - ✅ **Système de dé** (D20) avec animation
-- ✅ **Gestion des personnages** avec statistiques
-- ✅ **Persistance locale** (localStorage)
+- ✅ **Persistance de session** (localStorage + JWT)
 - ✅ **Design WoW authentique** avec animations dorées
 - ✅ **Interface responsive** (desktop/mobile)
-- ✅ **Scrollbar personnalisée** stylisée
+- ✅ **Menu adaptatif** selon l'état d'authentification
 
 ## 🚀 Installation et démarrage
 
 ### Prérequis
 - Node.js 16+ (LTS recommandé)
 - npm ou yarn
+- Symfony API lancée sur http://localhost:8080
 
 ### Étapes
 
@@ -39,6 +42,30 @@ npm install
 npm run dev
 ```
 L'application s'ouvrira à `http://localhost:5173`
+
+## 🔐 Authentification
+
+### Endpoints API utilisés
+
+- `POST /api/register` - Inscription
+  ```json
+  { "email": "user@exemple.com", "password": "Azerty$123" }
+  ```
+
+- `POST /api/login_check` - Connexion
+  ```json
+  { "username": "user@exemple.com", "password": "Azerty$123" }
+  ```
+
+### Pages
+
+- `/login` - Connexion
+- `/create` - Inscription
+- `/board` - Gestion des personnages (protégé)
+- `/perso` - Fiche personnage (protégé)
+- `/game` - Partie de jeu (protégé)
+
+Voir `API_DOCUMENTATION.md` pour la documentation complète.
 
 ## 📦 Build pour production
 
@@ -59,26 +86,49 @@ npm run preview
 ```
 react/
 ├── src/
-│   ├── main.jsx                 # Point d'entrée React
-│   ├── App.jsx                  # Composant principal
-│   ├── styles.css               # CSS (100% identique à game.html)
+│   ├── main.jsx                    # Point d'entrée React
+│   ├── App.jsx                     # Composant principal avec routes
+│   ├── styles.css                  # CSS global
+│   ├── pages/
+│   │   ├── Home.jsx                # Page d'accueil
+│   │   ├── Login.jsx               # Page de connexion (avec API)
+│   │   ├── Create.jsx              # Page d'inscription (avec API)
+│   │   ├── Board.jsx               # Gestion des personnages
+│   │   ├── Perso.jsx               # Fiche personnage détaillée
+│   │   └── Game.jsx                # Partie de jeu avec chat et dés
 │   ├── components/
-│   │   ├── Board.jsx            # Panneau latéral + personnage
-│   │   ├── CharacterCard.jsx    # Affichage du personnage
-│   │   ├── Chat.jsx             # Zone de chat
-│   │   └── Dice.jsx             # Système de dé
+│   │   ├── Navigation.jsx          # Menu de navigation
+│   │   ├── ProtectedRoute.jsx      # Protection des routes
+│   │   ├── CharacterCard.jsx       # Carte de personnage
+│   │   ├── Chat.jsx                # Zone de chat
+│   │   └── Dice.jsx                # Système de dé
 │   ├── context/
-│   │   └── GameContext.jsx      # Gestion de l'état global (React Context)
+│   │   ├── AuthContext.jsx         # Contexte d'authentification
+│   │   └── GameContext.jsx         # Contexte du jeu
 │   └── utils/
-│       ├── storage.js           # Utilitaires localStorage
-│       └── dice.js              # Utilitaires dé (D20)
+│       ├── api.js                  # Appels API (login, register, fetch)
+│       ├── storage.js              # localStorage utilities
+│       └── dice.js                 # Dé D20
 ├── public/
-│   └── assets/images/           # Images locales (PNG)
-├── index.html                   # Template HTML
+│   └── assets/images/              # Images des personnages
+├── API_DOCUMENTATION.md            # Documentation complète de l'API
+├── IMPLEMENTATION_SUMMARY.md       # Résumé de l'implémentation
+├── FILES_CHANGES.md                # Liste des changements
+├── QUICK_START.md                  # Commandes rapides
+├── TEST_CHECKLIST.md               # Checklist de tests
+├── index.html
 ├── package.json
-├── vite.config.js              # Configuration Vite
-└── README.md
+├── vite.config.js
+└── README.md                       # Ce fichier
 ```
+
+## 📚 Documentation
+
+- **[API_DOCUMENTATION.md](API_DOCUMENTATION.md)** - Documentation complète de l'API d'authentification
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Résumé de l'implémentation et flux d'authentification
+- **[FILES_CHANGES.md](FILES_CHANGES.md)** - Liste détaillée des fichiers créés et modifiés
+- **[QUICK_START.md](QUICK_START.md)** - Commandes rapides pour démarrer
+- **[TEST_CHECKLIST.md](TEST_CHECKLIST.md)** - Checklist complète pour tester l'application
 
 ## 🎮 Utilisation
 
