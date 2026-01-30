@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { register } from '../utils/api'
+import FlashMessage from '../components/FlashMessage'
 
 export default function Create() {
   const navigate = useNavigate()
@@ -11,6 +12,7 @@ export default function Create() {
   const [passwordMatch, setPasswordMatch] = useState(true)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [flashMessage, setFlashMessage] = useState({ message: '', type: '' })
 
   const handlePasswordChange = (value) => {
     setPassword(value)
@@ -29,12 +31,18 @@ export default function Create() {
     setError('')
 
     if (!passwordMatch) {
-      setError('Les mots de passe ne correspondent pas')
+      setFlashMessage({
+        message: 'Les mots de passe ne correspondent pas',
+        type: 'warning'
+      })
       return
     }
 
     if (!username || !email || !password) {
-      setError('Tous les champs sont requis')
+      setFlashMessage({
+        message: 'Tous les champs sont requis',
+        type: 'warning'
+      })
       return
     }
 
@@ -44,10 +52,20 @@ export default function Create() {
       // Appel à l'API d'inscription
       await register(email, password)
 
+      setFlashMessage({
+        message: 'Compte créé avec succès ! Redirection...',
+        type: 'success'
+      })
+
       // Redirection vers la page de connexion après inscription
-      navigate('/login', { state: { message: 'Compte créé avec succès ! Vous pouvez maintenant vous connecter.' } })
+      setTimeout(() => {
+        navigate('/login', { state: { message: 'Vous pouvez maintenant vous connecter.' } })
+      }, 1500)
     } catch (err) {
-      setError(err.message || 'Erreur lors de l\'inscription')
+      setFlashMessage({
+        message: err.message || 'Erreur lors de l\'inscription',
+        type: 'error'
+      })
     } finally {
       setLoading(false)
     }
@@ -55,6 +73,11 @@ export default function Create() {
 
   return (
     <div className="hero-page">
+      <FlashMessage
+        message={flashMessage.message}
+        type={flashMessage.type}
+        onClose={() => setFlashMessage({ message: '', type: '' })}
+      />
       <div className="background-pattern"></div>
       <div className="hero-container">
         <div className="hero-content">

@@ -28,6 +28,7 @@ export default function App() {
           <Route path="/create" element={<Create />} />
           <Route path="/board" element={<ProtectedRoute><Board /></ProtectedRoute>} />
           <Route path="/perso" element={<ProtectedRoute><Perso /></ProtectedRoute>} />
+          <Route path="/perso/:id" element={<ProtectedRoute><Perso /></ProtectedRoute>} />
           <Route path="/game" element={<ProtectedRoute><Game /></ProtectedRoute>} />
         </Routes>
       </GameProvider>

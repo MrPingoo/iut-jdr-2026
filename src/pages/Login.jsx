@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { login } from '../utils/api'
 import { useAuth } from '../context/AuthContext'
+import FlashMessage from '../components/FlashMessage'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -12,11 +13,15 @@ export default function Login() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const [flashMessage, setFlashMessage] = useState({ message: '', type: '' })
 
   useEffect(() => {
     // Récupérer le message de succès depuis la navigation
     if (location.state?.message) {
-      setSuccess(location.state.message)
+      setFlashMessage({
+        message: location.state.message,
+        type: 'success'
+      })
       // Nettoyer le state pour éviter que le message persiste
       window.history.replaceState({}, document.title)
     }
@@ -34,10 +39,20 @@ export default function Login() {
       // Sauvegarder le token
       setAuthToken(data.token)
 
+      setFlashMessage({
+        message: 'Connexion réussie ! Redirection...',
+        type: 'success'
+      })
+
       // Redirection vers le board après connexion
-      navigate('/board')
+      setTimeout(() => {
+        navigate('/board')
+      }, 1000)
     } catch (err) {
-      setError(err.message || 'Erreur de connexion')
+      setFlashMessage({
+        message: err.message || 'Erreur de connexion',
+        type: 'error'
+      })
     } finally {
       setLoading(false)
     }
@@ -45,6 +60,11 @@ export default function Login() {
 
   return (
     <div className="hero-page">
+      <FlashMessage
+        message={flashMessage.message}
+        type={flashMessage.type}
+        onClose={() => setFlashMessage({ message: '', type: '' })}
+      />
       <div className="background-pattern"></div>
       <div className="hero-container">
         <div className="hero-content">

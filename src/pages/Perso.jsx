@@ -1,6 +1,8 @@
-import React, { useContext, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useContext, useState, useEffect } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { GameContext } from '../context/GameContext'
+import { createCharacter, updateCharacter, getCharacter } from '../utils/api'
+import FlashMessage from '../components/FlashMessage'
 
 const RACES = ['Nain', 'Elfe', 'Gnome', 'Humain', 'Tiefling', 'Orc']
 const CLASSES = ['Barbare', 'Barde', 'Clerc', 'Druide', 'Magicien', 'Occultiste', 'Paladin', 'Rôdeur', 'Roublard']
@@ -25,20 +27,58 @@ const STAT_LABELS = {
 
 export default function Perso() {
   const navigate = useNavigate()
-  const { state, dispatch } = useContext(GameContext)
+  const { id } = useParams() // Pour l'édition d'un personnage existant
+  const { dispatch } = useContext(GameContext)
 
   const [formData, setFormData] = useState({
-    name: state.selectedCharacter?.name || '',
-    race: state.selectedCharacter?.race || '',
-    class: state.selectedCharacter?.class || '',
+    name: '',
+    race: '',
+    class: '',
     playerCount: 4,
-    strength: state.selectedCharacter?.stats?.strength || 10,
-    constitution: state.selectedCharacter?.stats?.constitution || 10,
-    intelligence: state.selectedCharacter?.stats?.intelligence || 10,
-    wisdom: state.selectedCharacter?.stats?.wisdom || 10,
-    dexterity: state.selectedCharacter?.stats?.dexterity || 10,
-    charisma: state.selectedCharacter?.stats?.charisma || 10
+    strength: 10,
+    constitution: 10,
+    intelligence: 10,
+    wisdom: 10,
+    dexterity: 10,
+    charisma: 10
   })
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState(null)
+  const [flashMessage, setFlashMessage] = useState({ message: '', type: '' })
+
+  // Charger le personnage si on est en mode édition
+  useEffect(() => {
+    if (id) {
+      loadCharacter(id)
+    }
+  }, [id])
+
+  const loadCharacter = async (characterId) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const character = await getCharacter(characterId)
+
+      setFormData({
+        name: character.name || '',
+        race: character.race || '',
+        class: character.class || '',
+        playerCount: character.players || 4,
+        strength: character.statistic?.strength || 10,
+        constitution: character.statistic?.constitution || 10,
+        intelligence: character.statistic?.intelligence || 10,
+        wisdom: character.statistic?.wisdom || 10,
+        dexterity: character.statistic?.dexterity || 10,
+        charisma: character.statistic?.charisma || 10
+      })
+    } catch (err) {
+      setError(err.message)
+      console.error('Erreur lors du chargement du personnage:', err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleChange = (field, value) => {
     setFormData(prev => ({
@@ -47,43 +87,127 @@ export default function Perso() {
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!formData.name || !formData.race || !formData.class) {
-      alert('Veuillez remplir tous les champs obligatoires (Nom, Race, Classe)')
+      setFlashMessage({
+        message: 'Veuillez remplir tous les champs obligatoires (Nom, Race, Classe)',
+        type: 'warning'
+      })
       return
     }
 
-    const character = {
-      name: formData.name,
-      race: formData.race,
-      class: formData.class,
-      level: 1,
-      stats: {
-        strength: parseInt(formData.strength),
-        constitution: parseInt(formData.constitution),
-        intelligence: parseInt(formData.intelligence),
-        wisdom: parseInt(formData.wisdom),
-        dexterity: parseInt(formData.dexterity),
-        charisma: parseInt(formData.charisma)
-      },
-      image: CHARACTER_IMAGES[formData.race]
-    }
+    try {
+      setIsLoading(true)
+      setError(null)
 
-    dispatch({ type: 'SELECT_CHARACTER', payload: character })
-    navigate('/board')
+      // Préparer les données pour l'API (format backend Symfony)
+      const characterData = {
+        name: formData.name,
+        race: formData.race,
+        class: formData.class,
+        players: parseInt(formData.playerCount),
+        lvl: 1,
+        statistic: {
+          strength: parseInt(formData.strength),
+          constitution: parseInt(formData.constitution),
+          intelligence: parseInt(formData.intelligence),
+          wisdom: parseInt(formData.wisdom),
+          dexterity: parseInt(formData.dexterity),
+          charisma: parseInt(formData.charisma)
+        }
+      }
+
+      let result
+      if (id) {
+        // Mode édition
+        result = await updateCharacter(id, characterData)
+        setFlashMessage({
+          message: `${formData.name} a été modifié avec succès !`,
+          type: 'success'
+        })
+      } else {
+        // Mode création
+        result = await createCharacter(characterData)
+        setFlashMessage({
+          message: `${formData.name} a été créé avec succès !`,
+          type: 'success'
+        })
+      }
+
+      // Mettre à jour le contexte pour la sélection
+      const character = {
+        id: result.id || id,
+        name: formData.name,
+        race: formData.race,
+        class: formData.class,
+        level: characterData.lvl,
+        stats: {
+          strength: parseInt(formData.strength),
+          constitution: parseInt(formData.constitution),
+          intelligence: parseInt(formData.intelligence),
+          wisdom: parseInt(formData.wisdom),
+          dexterity: parseInt(formData.dexterity),
+          charisma: parseInt(formData.charisma)
+        },
+        image: CHARACTER_IMAGES[formData.race]
+      }
+
+      dispatch({ type: 'SELECT_CHARACTER', payload: character })
+
+      // Rediriger vers la liste des personnages après un délai pour voir le message
+      setTimeout(() => {
+        navigate('/board')
+      }, 1500)
+    } catch (err) {
+      setError(err.message)
+      setFlashMessage({
+        message: `Erreur: ${err.message}`,
+        type: 'error'
+      })
+      console.error('Erreur lors de la sauvegarde du personnage:', err)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className="hero-page">
+      <FlashMessage
+        message={flashMessage.message}
+        type={flashMessage.type}
+        onClose={() => setFlashMessage({ message: '', type: '' })}
+      />
       <div className="background-pattern"></div>
       <div className="hero-container">
         <div className="hero-content character-sheet">
           <div className="hero-content-inner">
             <h1 className="hero-title">Fiche Personnage</h1>
             <div className="hero-divider"></div>
-            <p className="hero-subtitle">Créez votre héros</p>
+            <p className="hero-subtitle">{id ? 'Modifiez votre héros' : 'Créez votre héros'}</p>
+
+            {error && (
+              <div style={{
+                backgroundColor: '#ff4444',
+                color: 'white',
+                padding: '1rem',
+                borderRadius: '8px',
+                marginBottom: '1rem'
+              }}>
+                ⚠️ {error}
+              </div>
+            )}
+
+            {isLoading && (
+              <div style={{
+                textAlign: 'center',
+                padding: '2rem',
+                color: '#ffd700'
+              }}>
+                ⏳ Chargement...
+              </div>
+            )}
 
             <form className="hero-form" onSubmit={handleSubmit}>
               {/* Informations de base */}
@@ -187,17 +311,18 @@ export default function Perso() {
               </table>
 
               <div className="hero-buttons">
-                <button type="submit" className="hero-btn hero-btn-create">
+                <button type="submit" className="hero-btn hero-btn-create" disabled={isLoading}>
                   <span className="btn-icon">⚔️</span>
-                  Créer le personnage
+                  {isLoading ? 'Sauvegarde...' : (id ? 'Modifier le personnage' : 'Créer le personnage')}
                 </button>
                 <button
                   type="button"
                   className="hero-btn hero-btn-login"
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate('/board')}
+                  disabled={isLoading}
                 >
                   <span className="btn-icon">🔙</span>
-                  Retour à l'accueil
+                  Retour à la liste
                 </button>
               </div>
             </form>
