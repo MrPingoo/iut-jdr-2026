@@ -1146,67 +1146,67 @@ body, html, #root {
 
 /* Panneau personnage */
 .character-panel {
-    padding: 1.5rem;
+    padding: 1rem;
     border-bottom: 2px solid rgba(184, 134, 11, 0.3);
     flex-shrink: 0;
 }
 
 .character-avatar {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .character-portrait {
-    width: 120px;
-    height: 120px;
-    border: 3px solid #b8860b;
+    width: 80px;
+    height: 80px;
+    border: 2px solid #b8860b;
     border-radius: 50%;
     object-fit: cover;
     box-shadow:
-        0 0 20px rgba(184, 134, 11, 0.6),
+        0 0 15px rgba(184, 134, 11, 0.6),
         inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .character-name {
     font-family: 'Cinzel', serif;
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #ffd700;
     text-shadow: 0 0 10px #ffd700;
-    margin-top: 0.8rem;
+    margin-top: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
 .character-info {
     color: #c9aa71;
-    font-size: 0.9rem;
-    margin-top: 0.3rem;
+    font-size: 0.8rem;
+    margin-top: 0.2rem;
 }
 
 .stats-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.8rem;
-    margin-top: 1rem;
+    gap: 0.5rem;
+    margin-top: 0.8rem;
 }
 
 .stat-item {
     background: rgba(0, 0, 0, 0.3);
-    padding: 0.8rem;
+    padding: 0.5rem;
     border: 1px solid rgba(184, 134, 11, 0.3);
     text-align: center;
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: #c9aa71;
     text-transform: uppercase;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
 }
 
 .stat-value {
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
     color: #ffd700;
 }
@@ -1215,7 +1215,7 @@ body, html, #root {
 .companions-panel {
     padding: 1.5rem;
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
 }
 
 .companions-title {
@@ -1330,28 +1330,64 @@ body, html, #root {
 }
 
 .message {
-    margin-bottom: 1rem;
-    padding: 0.8rem;
-    background: rgba(184, 134, 11, 0.1);
+    margin-bottom: 1.2rem;
+    padding: 1rem;
+    background: rgba(184, 134, 11, 0.08);
     border-left: 3px solid #b8860b;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.message:hover {
+    background: rgba(184, 134, 11, 0.12);
+}
+
+.message-header {
+    margin-bottom: 0.5rem;
+}
+
+.message-content {
+    line-height: 1.6;
+    color: #f4e4bc;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 
 .message-dm {
     color: #ffd700;
     font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 3px;
 }
 
 .message-system {
     color: #87ceeb;
     font-style: italic;
+    font-weight: 500;
 }
 
 .message-action {
     color: #ffa500;
+    font-weight: 600;
 }
 
 .message-narrator {
     color: #c9aa71;
+    font-style: italic;
+}
+
+.message-npc {
+    color: #90ee90;
+    font-weight: 600;
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    background: rgba(144, 238, 144, 0.1);
+    border-radius: 3px;
 }
 
 /* Zone de saisie */
@@ -1512,3 +1548,218 @@ body, html, #root {
     gap: 10px;
 }
 
+/* ==========================================
+   COMPANIONS PANEL - Panneau des compagnons (dans sidebar)
+   ========================================== */
+
+.companions-panel {
+    background: linear-gradient(145deg, rgba(26, 26, 26, 0.95) 0%, rgba(13, 13, 13, 0.98) 100%);
+    border: 2px solid transparent;
+    border-image: linear-gradient(135deg, #b8860b 0%, #ffd700 50%, #b8860b 100%);
+    border-image-slice: 1;
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-top: 1.5rem;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.8),
+        0 4px 16px rgba(184, 134, 11, 0.4),
+        inset 0 1px 0 rgba(255, 215, 0, 0.1);
+    position: relative;
+    overflow-y: scroll;
+}
+
+.companions-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    opacity: 0.5;
+}
+
+.companions-title {
+    color: #ffd700;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(184, 134, 11, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    font-family: 'Cinzel', serif;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow:
+        0 0 10px rgba(255, 215, 0, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.8);
+    position: relative;
+}
+
+.companions-title::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #ffd700, transparent);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+.npc-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+}
+
+.companions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Scrollbar personnalisée élégante */
+.companions-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.companions-list::-webkit-scrollbar-track {
+    background: rgba(184, 134, 11, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(184, 134, 11, 0.2);
+}
+
+.companions-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.companions-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ffe44d 0%, #d4af37 100%);
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+}
+
+.companion-card {
+    background: linear-gradient(135deg,
+        rgba(184, 134, 11, 0.12) 0%,
+        rgba(26, 26, 26, 0.8) 50%,
+        rgba(184, 134, 11, 0.08) 100%);
+    border: 1px solid rgba(184, 134, 11, 0.4);
+    border-radius: 8px;
+    padding: 0.85rem;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.companion-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(255, 215, 0, 0.1),
+        transparent);
+    transition: left 0.5s ease;
+}
+
+.companion-card:hover::before {
+    left: 100%;
+}
+
+.companion-card:hover {
+    border-color: #ffd700;
+    box-shadow:
+        0 4px 20px rgba(184, 134, 11, 0.4),
+        0 0 16px rgba(255, 215, 0, 0.3),
+        inset 0 1px 0 rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px) scale(1.02);
+    background: linear-gradient(135deg,
+        rgba(184, 134, 11, 0.2) 0%,
+        rgba(26, 26, 26, 0.9) 50%,
+        rgba(184, 134, 11, 0.15) 100%);
+}
+
+.companion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.companion-name {
+    color: #90ee90;
+    font-weight: 700;
+    font-size: 1rem;
+    font-family: 'Cinzel', serif;
+    text-shadow:
+        0 0 10px rgba(144, 238, 144, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+}
+
+.companion-level {
+    color: #1a1a1a;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ffd700 0%, #d4af37 100%);
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    box-shadow:
+        0 2px 8px rgba(255, 215, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.companion-info {
+    color: #d4af37;
+    font-size: 0.875rem;
+    margin-bottom: 0.4rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    font-weight: 500;
+}
+
+.companion-race {
+    font-weight: 600;
+    color: #c9aa71;
+}
+
+.companion-separator {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.companion-class {
+    font-style: italic;
+    color: #ffa500;
+    font-weight: 600;
+}
+
+.companion-personality {
+    color: #87ceeb;
+    font-size: 0.8rem;
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    padding-left: 0.5rem;
+    border-left: 3px solid rgba(135, 206, 235, 0.3);
+    font-style: italic;
+    font-weight: 500;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}

@@ -1,95 +1,348 @@
 import React, { useContext, useState, useRef, useEffect } from 'react'
 import { GameContext } from '../context/GameContext'
-
-const INITIAL_MESSAGES = [
-  { id: 1, author: 'Maître du Jeu', text: 'Bienvenue dans les Terres Désolées d\'Azeroth, braves aventuriers ! Vous vous tenez devant l\'entrée du donjon maudit de Rochenoire...', type: 'dm' },
-  { id: 2, author: 'Narrateur', text: 'Un vent glacial souffle à travers les couloirs sombres. Vous entendez des grondements sourds provenant des profondeurs du donjon.', type: 'narrator' },
-  { id: 3, author: 'Système', text: 'Grimjaw le Sombre fait un test de Perception. Lancez un dé à 20 faces !', type: 'system' },
-  { id: 4, author: 'Action', text: 'Grimjaw s\'avance prudemment, sa hache à la main, scrutant les ombres à la recherche de dangers...', type: 'action' },
-  { id: 5, author: 'Maître du Jeu', text: 'Excellent ! Vous remarquez des traces de pattes de gobelins sur le sol poussiéreux. Il semble qu\'ils soient passés récemment...', type: 'dm' },
-  { id: 6, author: 'Système', text: 'Initiative de combat ! Tous les joueurs lancent 1d20 + modificateur de Dextérité.', type: 'system' },
-  { id: 7, author: 'Narrateur', text: 'Soudain, trois gobelins bondissent des ombres ! Leurs yeux rouges brillent de malice tandis qu\'ils brandissent leurs cimeterres rouillés !', type: 'narrator' },
-  { id: 8, author: 'Maître du Jeu', text: 'Le premier gobelin charge vers Grimjaw avec un cri perçant ! Faites un jet de sauvegarde de Dextérité !', type: 'dm' },
-  { id: 9, author: 'Grimjaw le Sombre', text: 'Je lève ma hache et contre-attaque avec rage ! *rugit de colère*', type: 'action' },
-  { id: 10, author: 'Système', text: 'Jet d\'attaque : 18 + 7 = 25 ! Touché critique !', type: 'system' },
-  { id: 11, author: 'Narrateur', text: 'La hache de Grimjaw fend l\'air avec une précision mortelle, tranchant profondément dans la chair du gobelin...', type: 'narrator' },
-  { id: 12, author: 'Maître du Jeu', text: 'Excellent coup ! Le gobelin s\'effondre dans un gargouillis. Les deux autres gobelins semblent maintenant terrorisés...', type: 'dm' },
-  { id: 13, author: 'Système', text: 'Les gobelins tentent de fuir ! Jet de moral : 3 - Échec !', type: 'system' },
-  { id: 14, author: 'Narrateur', text: 'Un écho lointain résonne dans les couloirs... D\'autres créatures ont entendu le combat et se dirigent vers vous !', type: 'narrator' }
-]
+import { startGameSession, sendPlayerAction, sendDiceResult, getNpcAction } from '../utils/api'
+import FlashMessage from './FlashMessage'
 
 export default function Chat() {
   const { state, dispatch } = useContext(GameContext)
   const [input, setInput] = useState('')
-  const [chatMessages, setChatMessages] = useState(INITIAL_MESSAGES)
+  const [chatMessages, setChatMessages] = useState([])
+  const [messageHistory, setMessageHistory] = useState([]) // Pour ChatGPT
+  const [isLoading, setIsLoading] = useState(false)
+  const [gameStarted, setGameStarted] = useState(false)
+  const [sessionId, setSessionId] = useState(null)
+  const [flashMessage, setFlashMessage] = useState({ message: '', type: '' })
+  const [pendingDiceContext, setPendingDiceContext] = useState(null)
   const messagesRef = useRef(null)
 
+  // Auto-scroll vers le bas lors de nouveaux messages
   useEffect(() => {
     if (messagesRef.current) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight
     }
   }, [chatMessages])
 
+  // Démarrer la session de jeu automatiquement quand un personnage est sélectionné
+  useEffect(() => {
+    if (state.selectedCharacter && !gameStarted) {
+      initializeGame()
+    }
+  }, [state.selectedCharacter])
+
+  // Gérer les résultats de jets de dés depuis le contexte
+  useEffect(() => {
+    if (state.dice?.lastResult && pendingDiceContext) {
+      handleDiceRoll(state.dice.lastResult)
+    }
+  }, [state.dice?.lastResult])
+
+  /**
+   * Initialise la session de jeu avec ChatGPT
+   */
+  async function initializeGame() {
+    if (!state.selectedCharacter) return
+
+    setIsLoading(true)
+    try {
+      const response = await startGameSession(
+        state.selectedCharacter,
+        4, // Nombre de joueurs par défaut
+        "Terres Désolées d'Azeroth"
+      )
+
+      setSessionId(response.sessionId)
+      setGameStarted(true)
+
+      // Stocker les PNJs dans le contexte global
+      dispatch({ type: 'SET_NPCS', payload: response.npcs || [] })
+
+      // Ajouter le message d'introduction
+      const introMessage = {
+        id: Date.now(),
+        author: 'Maître du Jeu',
+        text: response.introduction,
+        type: 'dm'
+      }
+
+      setChatMessages([introMessage])
+      setMessageHistory([
+        { role: 'assistant', content: response.introduction }
+      ])
+
+      // Afficher les PNJs générés
+      const npcCount = response.npcs?.length || 0
+      const npcNames = response.npcs?.map(npc => npc.name).join(', ') || ''
+
+      setFlashMessage({
+        message: `La partie a commencé ! ${npcCount} compagnon${npcCount > 1 ? 's' : ''} vous accompagne${npcCount > 1 ? 'nt' : ''} : ${npcNames}`,
+        type: 'success'
+      })
+    } catch (error) {
+      console.error('Erreur lors du démarrage de la partie:', error)
+      setFlashMessage({
+        message: `Erreur: ${error.message}`,
+        type: 'error'
+      })
+
+      // Message de fallback
+      const fallbackMessage = {
+        id: Date.now(),
+        author: 'Système',
+        text: 'Impossible de contacter le Maître du Jeu. Veuillez vérifier votre connexion.',
+        type: 'system'
+      }
+      setChatMessages([fallbackMessage])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  /**
+   * Détermine la classe CSS du message selon son type
+   */
   function getMessageClass(type) {
     switch(type) {
       case 'dm': return 'message-dm'
       case 'system': return 'message-system'
       case 'narrator': return 'message-narrator'
       case 'action': return 'message-action'
+      case 'npc': return 'message-npc'
       default: return 'message-action'
     }
   }
 
-  function sendMessage() {
+  /**
+   * Envoie un message du joueur
+   */
+  async function sendMessage() {
     const text = input.trim()
-    if (!text) return
+    if (!text || isLoading) return
 
-    const characterName = state.selectedCharacter?.name || 'Grimjaw le Sombre'
-    const newMessage = {
+    const characterName = state.selectedCharacter?.name || 'Aventurier'
+
+    // Ajouter le message du joueur
+    const playerMessage = {
       id: Date.now(),
       author: characterName,
       text: text,
       type: 'action'
     }
 
-    setChatMessages([...chatMessages, newMessage])
-    dispatch({ type: 'SEND_MESSAGE', payload: newMessage })
+    setChatMessages(prev => [...prev, playerMessage])
     setInput('')
+    setIsLoading(true)
 
-    // Réponse automatique du Maître du Jeu (simulation)
-    setTimeout(() => {
-      const responses = [
-        "Excellent ! Lancez un dé pour déterminer le succès de votre action.",
-        "Intéressant... Les conséquences de vos actes se révèleront bientôt.",
-        "Votre action attire l'attention des créatures environnantes...",
-        "Brillant ! Cette approche pourrait bien vous sauver la vie.",
-        "Attention ! Vous entendez des pas qui se rapprochent..."
+    try {
+      // Envoyer l'action au Game Master (ChatGPT)
+      const response = await sendPlayerAction({
+        character: state.selectedCharacter,
+        action: text,
+        context: {
+          location: "Donjon de Rochenoire",
+          sessionId: sessionId
+        },
+        history: messageHistory
+      })
+
+      // Mettre à jour l'historique pour ChatGPT
+      const newHistory = [
+        ...messageHistory,
+        { role: 'user', content: text },
+        { role: 'assistant', content: response.response }
       ]
+      setMessageHistory(newHistory)
 
+      // Ajouter la réponse du Maître du Jeu
       const dmMessage = {
         id: Date.now() + 1,
         author: 'Maître du Jeu',
-        text: responses[Math.floor(Math.random() * responses.length)],
+        text: response.response,
         type: 'dm'
       }
 
       setChatMessages(prev => [...prev, dmMessage])
-      dispatch({ type: 'RECEIVE_MESSAGE', payload: dmMessage })
-    }, 1500)
+
+      // Vérifier si le MJ demande un jet de dé
+      if (response.response.toLowerCase().includes('jet de') ||
+          response.response.toLowerCase().includes('lancez') ||
+          response.response.toLowerCase().includes('dd ')) {
+        setPendingDiceContext(text) // Stocker le contexte pour le prochain jet
+      }
+
+      // Optionnel: Générer une réponse d'un PNJ de temps en temps
+      if (Math.random() > 0.7) { // 30% de chance
+        setTimeout(() => generateNpcResponse(response.response), 2000)
+      }
+
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi du message:', error)
+      setFlashMessage({
+        message: `Erreur: ${error.message}`,
+        type: 'error'
+      })
+
+      // Message d'erreur
+      const errorMessage = {
+        id: Date.now() + 1,
+        author: 'Système',
+        text: 'Le Maître du Jeu ne répond pas. Veuillez réessayer.',
+        type: 'system'
+      }
+      setChatMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
+    }
   }
 
+  /**
+   * Génère une réponse d'un PNJ compagnon
+   */
+  async function generateNpcResponse(situation) {
+    // Utiliser les PNJs du contexte global
+    const availableNpcs = state.npcs && state.npcs.length > 0 ? state.npcs : [
+      { name: 'Elara la Sage', race: 'Elfe', class: 'Magicien', personality: 'intellectuel' },
+      { name: 'Thorin Bouclier-de-Fer', race: 'Nain', class: 'Paladin', personality: 'loyal' },
+      { name: 'Lyssa Ombre-Rapide', race: 'Humain', class: 'Roublard', personality: 'rusé' }
+    ]
+
+    const randomNpc = availableNpcs[Math.floor(Math.random() * availableNpcs.length)]
+
+    try {
+      const response = await getNpcAction({
+        npc: randomNpc,
+        situation: situation,
+        history: messageHistory.slice(-4) // Seulement les 4 derniers messages
+      })
+
+      const npcMessage = {
+        id: Date.now(),
+        author: response.npcName,
+        text: response.npcResponse,
+        type: 'npc'
+      }
+
+      setChatMessages(prev => [...prev, npcMessage])
+    } catch (error) {
+      console.error('Erreur lors de la génération de la réponse du PNJ:', error)
+    }
+  }
+
+  /**
+   * Gère le clic sur le bouton de dé
+   */
   function handleDiceClick() {
-    dispatch({ type: 'ROLL_DICE', payload: Math.floor(Math.random()*20)+1 })
+    const result = Math.floor(Math.random() * 20) + 1
+    dispatch({ type: 'ROLL_DICE', payload: result })
+
+    // Afficher le résultat dans le chat
+    const diceMessage = {
+      id: Date.now(),
+      author: 'Système',
+      text: `🎲 ${state.selectedCharacter?.name || 'Joueur'} a lancé un d20 : ${result}`,
+      type: 'system'
+    }
+    setChatMessages(prev => [...prev, diceMessage])
+  }
+
+  /**
+   * Traite le résultat d'un jet de dé avec ChatGPT
+   */
+  async function handleDiceRoll(result) {
+    if (!pendingDiceContext || isLoading) return
+
+    setIsLoading(true)
+
+    // Calculer le modificateur basé sur les stats du personnage
+    const modifier = Math.floor((state.selectedCharacter?.stats?.dexterity || 10) / 2) - 5
+    const total = result + modifier
+
+    try {
+      const response = await sendDiceResult({
+        character: state.selectedCharacter,
+        diceRoll: {
+          type: 'd20',
+          result: result,
+          modifier: modifier,
+          total: total,
+          skillCheck: 'Action'
+        },
+        context: pendingDiceContext,
+        history: messageHistory
+      })
+
+      // Mettre à jour l'historique
+      const newHistory = [
+        ...messageHistory,
+        { role: 'user', content: `Résultat du dé: ${result} + ${modifier} = ${total}` },
+        { role: 'assistant', content: response.response }
+      ]
+      setMessageHistory(newHistory)
+
+      // Ajouter la réponse du MJ
+      const dmMessage = {
+        id: Date.now() + 2,
+        author: 'Maître du Jeu',
+        text: response.response,
+        type: 'dm'
+      }
+
+      setChatMessages(prev => [...prev, dmMessage])
+      setPendingDiceContext(null) // Réinitialiser le contexte
+
+    } catch (error) {
+      console.error('Erreur lors du traitement du jet de dé:', error)
+      setFlashMessage({
+        message: `Erreur: ${error.message}`,
+        type: 'error'
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <>
+      <FlashMessage
+        message={flashMessage.message}
+        type={flashMessage.type}
+        onClose={() => setFlashMessage({ message: '', type: '' })}
+      />
+
+
       <div className="chat-messages" id="chat-messages" ref={messagesRef}>
+        {chatMessages.length === 0 && !isLoading && (
+          <div style={{
+            textAlign: 'center',
+            padding: '2rem',
+            color: '#888',
+            fontStyle: 'italic'
+          }}>
+            En attente du Maître du Jeu...
+          </div>
+        )}
+
         {chatMessages.map(m => (
           <div key={m.id} className="message">
-            <span className={getMessageClass(m.type)}>{m.author} :</span> {m.text}
+            <div className="message-header">
+              <span className={getMessageClass(m.type)}>{m.author}</span>
+            </div>
+            <div className="message-content">
+              {m.text.split('\n').map((line, index) => (
+                <React.Fragment key={index}>
+                  {line}
+                  {index < m.text.split('\n').length - 1 && <br />}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
         ))}
+
+        {isLoading && (
+          <div className="message">
+            <span className="message-system">Système :</span>
+            <em>Le Maître du Jeu réfléchit...</em> ⏳
+          </div>
+        )}
       </div>
 
       <div className="chat-input-area">
@@ -107,13 +360,24 @@ export default function Chat() {
             }}
             placeholder="Décrivez votre action ou parlez au Maître du Jeu..."
             rows={3}
+            disabled={isLoading || !gameStarted}
           />
         </div>
         <div className="game-controls">
-          <button className="btn-send" id="send-btn" onClick={sendMessage}>
+          <button
+            className="btn-send"
+            id="send-btn"
+            onClick={sendMessage}
+            disabled={isLoading || !input.trim() || !gameStarted}
+          >
             📝 Envoyer
           </button>
-          <button className="btn-dice" id="dice-btn" onClick={handleDiceClick}>
+          <button
+            className="btn-dice"
+            id="dice-btn"
+            onClick={handleDiceClick}
+            disabled={isLoading || !gameStarted}
+          >
             🎲 Lancer le dé
           </button>
         </div>

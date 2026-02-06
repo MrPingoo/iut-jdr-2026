@@ -30,8 +30,8 @@ export default function Game() {
           </div>
         </div>
       </div>
+
       <Dice />
     </div>
   )
 }
-

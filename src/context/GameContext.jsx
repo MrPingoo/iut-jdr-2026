@@ -3,7 +3,8 @@ import { getLocal, setLocal } from '../utils/storage.js'
 
 const initialState = {
   selectedCharacter: null,
-  dice: { lastResult: null }
+  dice: { lastResult: null },
+  npcs: []
 }
 
 function reducer(state, action) {
@@ -12,6 +13,8 @@ function reducer(state, action) {
       return { ...state, selectedCharacter: action.payload }
     case 'SELECT_CHARACTER':
       return { ...state, selectedCharacter: action.payload }
+    case 'SET_NPCS':
+      return { ...state, npcs: action.payload }
     case 'ROLL_DICE':
       return { ...state, dice: { lastResult: action.payload } }
     default:
