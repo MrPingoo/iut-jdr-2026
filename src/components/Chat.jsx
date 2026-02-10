@@ -2,6 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from 'react'
 import { GameContext } from '../context/GameContext'
 import { startGameSession, sendPlayerAction, sendDiceResult, getNpcAction } from '../utils/api'
 import FlashMessage from './FlashMessage'
+import { calculateMaxHp } from '../utils/hpCalculator'
 
 export default function Chat() {
   const { state, dispatch } = useContext(GameContext)
@@ -56,11 +57,14 @@ export default function Chat() {
       // Stocker les PNJs dans le contexte global
       dispatch({ type: 'SET_NPCS', payload: response.npcs || [] })
 
+      // Parser et appliquer les changements de PV (si présents dans l'introduction)
+      const cleanedIntro = parseAndApplyHpChanges(response.introduction)
+
       // Ajouter le message d'introduction
       const introMessage = {
         id: Date.now(),
         author: 'Maître du Jeu',
-        text: response.introduction,
+        text: cleanedIntro,
         type: 'dm'
       }
 
@@ -95,6 +99,60 @@ export default function Chat() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  /**
+   * Parse la réponse de l'IA pour détecter et appliquer les changements de PV
+   * Format attendu: [HP_CHANGE] {"character": "NomPersonnage", "change": -5, "reason": "Raison"}
+   */
+  function parseAndApplyHpChanges(responseText) {
+    const hpChangeRegex = /\[HP_CHANGE]\s*({[^}]+})/g
+    let match
+
+    while ((match = hpChangeRegex.exec(responseText)) !== null) {
+      try {
+        const hpData = JSON.parse(match[1])
+
+        const characterName = state.selectedCharacter?.name || ''
+
+        // Appliquer le changement au personnage principal
+        if (hpData.character === characterName) {
+          const newHp = state.characterHp + hpData.change
+          dispatch({ type: 'SET_CHARACTER_HP', payload: newHp })
+
+          // Afficher un message dans le chat
+          const hpMessage = {
+            id: Date.now() + Math.random(),
+            author: 'Système',
+            text: `💔 ${characterName} ${hpData.change > 0 ? 'récupère' : 'perd'} ${Math.abs(hpData.change)} PV (${hpData.reason})`,
+            type: 'system'
+          }
+          setChatMessages(prev => [...prev, hpMessage])
+        } else {
+          // Appliquer le changement à un compagnon
+          const npcIndex = state.npcs.findIndex(npc => npc.name === hpData.character)
+          if (npcIndex !== -1) {
+            const currentNpcHp = state.npcHp[npcIndex] || 35
+            const newNpcHp = currentNpcHp + hpData.change
+            dispatch({ type: 'SET_NPC_HP', payload: { index: npcIndex, hp: newNpcHp } })
+
+            // Afficher un message dans le chat
+            const hpMessage = {
+              id: Date.now() + Math.random(),
+              author: 'Système',
+              text: `💔 ${hpData.character} ${hpData.change > 0 ? 'récupère' : 'perd'} ${Math.abs(hpData.change)} PV (${hpData.reason})`,
+              type: 'system'
+            }
+            setChatMessages(prev => [...prev, hpMessage])
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors du parsing des changements de PV:', error)
+      }
+    }
+
+    // Retourner le texte nettoyé (sans les marqueurs [HP_CHANGE])
+    return responseText.replace(/\[HP_CHANGE]\s*{[^}]+}\n?/g, '')
   }
 
   /**
@@ -133,14 +191,25 @@ export default function Chat() {
     setIsLoading(true)
 
     try {
+      // Préparer le contexte avec les PV actuels et max
+      const characterMaxHp = calculateMaxHp(state.selectedCharacter?.level || 1)
+      const gameContext = {
+        location: "Donjon de Rochenoire",
+        sessionId: sessionId,
+        characterHp: state.characterHp,
+        characterMaxHp: characterMaxHp,
+        companionsHp: state.npcs.map((npc, index) => ({
+          name: npc.name,
+          hp: state.npcHp[index] || calculateMaxHp(npc.level || 1),
+          maxHp: calculateMaxHp(npc.level || 1)
+        }))
+      }
+
       // Envoyer l'action au Game Master (ChatGPT)
       const response = await sendPlayerAction({
         character: state.selectedCharacter,
         action: text,
-        context: {
-          location: "Donjon de Rochenoire",
-          sessionId: sessionId
-        },
+        context: gameContext,
         history: messageHistory
       })
 
@@ -152,11 +221,14 @@ export default function Chat() {
       ]
       setMessageHistory(newHistory)
 
+      // Parser et appliquer les changements de PV
+      const cleanedResponse = parseAndApplyHpChanges(response.response)
+
       // Ajouter la réponse du Maître du Jeu
       const dmMessage = {
         id: Date.now() + 1,
         author: 'Maître du Jeu',
-        text: response.response,
+        text: cleanedResponse,
         type: 'dm'
       }
 
@@ -257,6 +329,18 @@ export default function Chat() {
     const total = result + modifier
 
     try {
+      // Préparer le contexte avec les PV actuels et max
+      const characterMaxHp = calculateMaxHp(state.selectedCharacter?.level || 1)
+      const gameContext = {
+        characterHp: state.characterHp,
+        characterMaxHp: characterMaxHp,
+        companionsHp: state.npcs.map((npc, index) => ({
+          name: npc.name,
+          hp: state.npcHp[index] || calculateMaxHp(npc.level || 1),
+          maxHp: calculateMaxHp(npc.level || 1)
+        }))
+      }
+
       const response = await sendDiceResult({
         character: state.selectedCharacter,
         diceRoll: {
@@ -267,6 +351,7 @@ export default function Chat() {
           skillCheck: 'Action'
         },
         context: pendingDiceContext,
+        gameContext: gameContext,
         history: messageHistory
       })
 
@@ -278,11 +363,14 @@ export default function Chat() {
       ]
       setMessageHistory(newHistory)
 
+      // Parser et appliquer les changements de PV
+      const cleanedResponse = parseAndApplyHpChanges(response.response)
+
       // Ajouter la réponse du MJ
       const dmMessage = {
         id: Date.now() + 2,
         author: 'Maître du Jeu',
-        text: response.response,
+        text: cleanedResponse,
         type: 'dm'
       }
 

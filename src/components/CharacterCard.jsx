@@ -1,8 +1,9 @@
 import React, { useContext } from 'react'
 import { GameContext } from '../context/GameContext'
+import { calculateMaxHp } from '../utils/hpCalculator'
 
 export default function CharacterCard() {
-  const { state } = useContext(GameContext)
+  const { state, dispatch } = useContext(GameContext)
 
   // Personnage par défaut : Grimjaw le Sombre
   const c = state.selectedCharacter || {
@@ -21,12 +22,27 @@ export default function CharacterCard() {
     image: '/assets/images/orc.png'
   }
 
+  const currentHp = state.characterHp
+  const maxHp = calculateMaxHp(c.level || 1)
+  const hpPercentage = (currentHp / maxHp) * 100
+
   return (
     <div>
       <div className="character-avatar">
         <img className="character-portrait" src={c.image} alt={c.name} onError={(e) => { e.target.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22120%22 height=%22120%22%3E%3Crect fill=%22%23333%22 width=%22120%22 height=%22120%22/%3E%3C/svg%3E' }} />
         <div className="character-name" id="character-name">{c.name}</div>
         <div className="character-info" id="character-info">{`${c.race} • ${c.class} • Niveau ${c.level}`}</div>
+      </div>
+
+      {/* Barre de PV */}
+      <div className="hp-container">
+        <div className="hp-label">Points de Vie</div>
+        <div className="hp-bar-wrapper">
+          <div className="hp-bar">
+            <div className="hp-bar-fill" style={{ width: `${hpPercentage}%` }}></div>
+            <div className="hp-text">{currentHp} / {maxHp}</div>
+          </div>
+        </div>
       </div>
 
       <div className="stats-grid">
