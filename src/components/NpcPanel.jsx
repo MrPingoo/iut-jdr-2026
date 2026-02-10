@@ -1,11 +1,13 @@
 import React, { useContext } from 'react'
 import { GameContext } from '../context/GameContext'
 import { calculateMaxHp } from '../utils/hpCalculator'
+import XpBar from './XpBar'
 
 export default function NpcPanel() {
-  const { state, dispatch } = useContext(GameContext)
+  const { state } = useContext(GameContext)
   const npcs = state.npcs || []
   const npcHp = state.npcHp || {}
+  const npcXp = state.npcXp || {}
 
   if (!npcs || npcs.length === 0) {
     return null
@@ -22,6 +24,7 @@ export default function NpcPanel() {
           const maxHp = calculateMaxHp(npc.level || 1)
           const currentHp = npcHp[index] || maxHp
           const hpPercentage = (currentHp / maxHp) * 100
+          const currentXp = npcXp[index] || 0
 
           return (
             <div key={index} className="companion-card">
@@ -48,6 +51,11 @@ export default function NpcPanel() {
                     <div className="hp-text hp-text-small">{currentHp} / {maxHp}</div>
                   </div>
                 </div>
+              </div>
+
+              {/* Barre d'XP pour le compagnon */}
+              <div className="companion-xp">
+                <XpBar currentXp={currentXp} currentLevel={npc.level || 1} />
               </div>
             </div>
           )

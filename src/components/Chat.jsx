@@ -57,8 +57,9 @@ export default function Chat() {
       // Stocker les PNJs dans le contexte global
       dispatch({ type: 'SET_NPCS', payload: response.npcs || [] })
 
-      // Parser et appliquer les changements de PV (si présents dans l'introduction)
-      const cleanedIntro = parseAndApplyHpChanges(response.introduction)
+      // Parser et appliquer les changements de PV et XP (si présents dans l'introduction)
+      let cleanedIntro = parseAndApplyHpChanges(response.introduction)
+      cleanedIntro = parseAndApplyXpGains(cleanedIntro)
 
       // Ajouter le message d'introduction
       const introMessage = {
@@ -156,6 +157,87 @@ export default function Chat() {
   }
 
   /**
+   * Parse la réponse de l'IA pour détecter et appliquer les gains d'XP
+   * Format attendu: [XP_GAIN] {"character": "NomPersonnage", "xp": 50, "reason": "Victoire contre un dragon"}
+   */
+  function parseAndApplyXpGains(responseText) {
+    const xpGainRegex = /\[XP_GAIN]\s*({[^}]+})/g
+    let match
+
+    while ((match = xpGainRegex.exec(responseText)) !== null) {
+      try {
+        const xpData = JSON.parse(match[1])
+
+        const characterName = state.selectedCharacter?.name || ''
+
+        // Appliquer le gain d'XP au personnage principal
+        if (xpData.character === characterName) {
+          const oldLevel = state.selectedCharacter?.level || 1
+          dispatch({ type: 'ADD_CHARACTER_XP', payload: xpData.xp })
+
+          // Afficher un message de gain d'XP
+          const xpMessage = {
+            id: Date.now() + Math.random(),
+            author: 'Système',
+            text: `⭐ ${characterName} gagne ${xpData.xp} XP ! (${xpData.reason})`,
+            type: 'system'
+          }
+          setChatMessages(prev => [...prev, xpMessage])
+
+          // Vérifier si le niveau a augmenté (sera géré par le reducer)
+          setTimeout(() => {
+            const newLevel = state.selectedCharacter?.level || 1
+            if (newLevel > oldLevel) {
+              const levelUpMessage = {
+                id: Date.now() + Math.random(),
+                author: 'Système',
+                text: `🎉 ${characterName} passe au niveau ${newLevel} ! PV restaurés.`,
+                type: 'system'
+              }
+              setChatMessages(prev => [...prev, levelUpMessage])
+            }
+          }, 100)
+        } else {
+          // Appliquer le gain d'XP à un compagnon
+          const npcIndex = state.npcs.findIndex(npc => npc.name === xpData.character)
+          if (npcIndex !== -1) {
+            const oldLevel = state.npcs[npcIndex]?.level || 1
+            dispatch({ type: 'ADD_NPC_XP', payload: { index: npcIndex, xp: xpData.xp } })
+
+            // Afficher un message de gain d'XP
+            const xpMessage = {
+              id: Date.now() + Math.random(),
+              author: 'Système',
+              text: `⭐ ${xpData.character} gagne ${xpData.xp} XP ! (${xpData.reason})`,
+              type: 'system'
+            }
+            setChatMessages(prev => [...prev, xpMessage])
+
+            // Vérifier si le niveau a augmenté
+            setTimeout(() => {
+              const newLevel = state.npcs[npcIndex]?.level || 1
+              if (newLevel > oldLevel) {
+                const levelUpMessage = {
+                  id: Date.now() + Math.random(),
+                  author: 'Système',
+                  text: `🎉 ${xpData.character} passe au niveau ${newLevel} ! PV restaurés.`,
+                  type: 'system'
+                }
+                setChatMessages(prev => [...prev, levelUpMessage])
+              }
+            }, 100)
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors du parsing des gains d\'XP:', error)
+      }
+    }
+
+    // Retourner le texte nettoyé (sans les marqueurs [XP_GAIN])
+    return responseText.replace(/\[XP_GAIN]\s*{[^}]+}\n?/g, '')
+  }
+
+  /**
    * Détermine la classe CSS du message selon son type
    */
   function getMessageClass(type) {
@@ -221,8 +303,9 @@ export default function Chat() {
       ]
       setMessageHistory(newHistory)
 
-      // Parser et appliquer les changements de PV
-      const cleanedResponse = parseAndApplyHpChanges(response.response)
+      // Parser et appliquer les changements de PV et XP
+      let cleanedResponse = parseAndApplyHpChanges(response.response)
+      cleanedResponse = parseAndApplyXpGains(cleanedResponse)
 
       // Ajouter la réponse du Maître du Jeu
       const dmMessage = {
@@ -363,8 +446,9 @@ export default function Chat() {
       ]
       setMessageHistory(newHistory)
 
-      // Parser et appliquer les changements de PV
-      const cleanedResponse = parseAndApplyHpChanges(response.response)
+      // Parser et appliquer les changements de PV et XP
+      let cleanedResponse = parseAndApplyHpChanges(response.response)
+      cleanedResponse = parseAndApplyXpGains(cleanedResponse)
 
       // Ajouter la réponse du MJ
       const dmMessage = {

@@ -1,9 +1,10 @@
 import React, { useContext } from 'react'
 import { GameContext } from '../context/GameContext'
 import { calculateMaxHp } from '../utils/hpCalculator'
+import XpBar from './XpBar'
 
 export default function CharacterCard() {
-  const { state, dispatch } = useContext(GameContext)
+  const { state } = useContext(GameContext)
 
   // Personnage par défaut : Grimjaw le Sombre
   const c = state.selectedCharacter || {
@@ -44,6 +45,9 @@ export default function CharacterCard() {
           </div>
         </div>
       </div>
+
+      {/* Barre d'XP */}
+      <XpBar currentXp={state.characterXp} currentLevel={c.level || 1} />
 
       <div className="stats-grid">
         <div className="stat-item">
